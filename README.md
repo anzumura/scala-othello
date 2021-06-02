@@ -1,1 +1,1 @@
-# scratch
+# Scala Othello

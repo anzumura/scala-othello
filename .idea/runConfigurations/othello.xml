@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="othello" type="Application" factoryName="Application">
+    <option name="MAIN_CLASS_NAME" value="main.game.Othello" />
+    <module name="othello" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
