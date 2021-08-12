@@ -11,7 +11,7 @@ object Game {
   def begin(): Unit = {
     board.initialSetup()
     while (makeMove()) {}
-    players.foreach(p => println("Total time for " + p + ": " + p.timeInSeconds))
+    players.foreach(p => println("Total time for " + p + ": " + p.timeInSeconds()))
   }
 
   @tailrec

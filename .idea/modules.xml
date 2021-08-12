@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/othello.iml" filepath="$PROJECT_DIR$/othello.iml" />
+      <module fileurl="file://$PROJECT_DIR$/scala-othello.iml" filepath="$PROJECT_DIR$/scala-othello.iml" />
     </modules>
   </component>
 </project>

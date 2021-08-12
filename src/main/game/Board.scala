@@ -11,14 +11,14 @@ class Board {
   var turn: Int = Black
   def otherColor: Int = turn ^ Flip
 
-  def this(board: Board) {
+  def this(board: Board) = {
     this()
     this.turn = board.turn
     for (i <- cells.indices)
       this.cells(i) = board.cells(i)
   }
 
-  def this(board: Board, move: (Int, Int)) {
+  def this(board: Board, move: (Int, Int)) = {
     this(board)
     setCell(move._1, move._2)
   }
