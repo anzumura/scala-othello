@@ -41,10 +41,7 @@ class Board:
         print("|" + i + "|")
       for (j <- Column.values)
         printCell(j.id, i - 1, state)
-      if (boarders)
-        println(" |" + i + "|")
-      else
-        println()
+      println(if boarders then " |" + i + "|" else "")
     if (boarders)
       println(Border)
       println(LeftEdge + (Column.values mkString " ") + RightEdge)
@@ -81,13 +78,13 @@ class Board:
     if (row < 6)
       flipDirection(col, row, horizontal, 1)
 
-  private def flipDirection(col: Int, row: Int, horizontal: Int, 
+  private def flipDirection(col: Int, row: Int, horizontal: Int,
                             vertical: Int): Unit =
     doFlipDirection(col + horizontal, row + vertical, horizontal, vertical)
 
-  private def doFlipDirection(col: Int, row: Int, horizontal: Int, 
+  private def doFlipDirection(col: Int, row: Int, horizontal: Int,
                               vertical: Int): Unit =
-    if (getCell(col, row) != turn && flipFound(col + horizontal, row + 
+    if (getCell(col, row) != turn && flipFound(col + horizontal, row +
       vertical, horizontal, vertical))
       flipCell(col, row)
 
@@ -96,7 +93,7 @@ class Board:
     if (col < A.id || col > H.id || row < 0 || row > 7)
       return false
     val cell = getCell(col, row)
-    // while the cells are the opposite color then recurse until my color is 
+    // while the cells are the opposite color then recurse until my color is
     // found
     if (cell == otherColor)
       if (flipFound(col + horizontal, row + vertical, horizontal, vertical))
@@ -119,7 +116,7 @@ class Board:
     print(" " + char)
 
 object Board:
-  // create a Board populated from an Array of Array[Int] (not all rows need 
+  // create a Board populated from an Array of Array[Int] (not all rows need
   // to be specified)
   def apply(x: Array[Int]*): Board =
     val b = new Board
