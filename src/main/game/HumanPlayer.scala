@@ -4,7 +4,7 @@ import scala.io.StdIn.readLine
 
 class HumanPlayer(color: PlayerColor.Value) extends Player(color):
   override def makeMove(board: Board, state: GameState): Boolean =
-    print("enter " + board.currentPlayer() + "'s move: ")
+    print("enter " + board.currentPlayer + "'s move: ")
     val line = readLine()
     line match
       case "v" => showValid = !showValid; true

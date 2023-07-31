@@ -47,6 +47,4 @@ class ComputerPlayer(color: PlayerColor.Value) extends Player(color):
     bestMove
 
   private def getTime: String =
-    val now = Calendar.getInstance().getTime
-    val f = new SimpleDateFormat("HH:mm:ss")
-    f.format(now)
+    SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime)

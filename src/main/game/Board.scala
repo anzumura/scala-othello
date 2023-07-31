@@ -47,16 +47,13 @@ class Board:
       println(LeftEdge + (Column.values mkString " ") + RightEdge)
       println(Border)
 
-  def currentPlayer(): String = if (turn == Black) "black" else "white"
+  def currentPlayer: String = if (turn == Black) "black" else "white"
 
   def getCell(col: Int, row: Int): Int =
-    var x = cells(row)
-    x = (x & (Flip << col)).asInstanceOf[Char]
-    x >> col
+    (cells(row) & (Flip << col)).asInstanceOf[Char] >> col
 
   def setCell(col: Int, row: Int): Unit =
-    var x = cells(row)
-    x = (x | (Flip << col)).asInstanceOf[Char]
+    val x = (cells(row) | (Flip << col)).asInstanceOf[Char]
     cells(row) = (x ^ (otherColor << col)).asInstanceOf[Char]
     calcFlips(col, row)
     turn = otherColor
@@ -103,9 +100,7 @@ class Board:
     cell == turn
 
   private def flipCell(col: Int, row: Int): Unit =
-    var x = cells(row)
-    x = (x ^ (Flip << col)).asInstanceOf[Char]
-    cells(row) = x
+    cells(row) = (cells(row) ^ (Flip << col)).asInstanceOf[Char]
 
   private def printCell(col: Int, row: Int, state: GameState): Unit =
     val cell = getCell(col, row)

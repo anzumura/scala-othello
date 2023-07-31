@@ -114,7 +114,7 @@ object ScoreCalculator:
       for (i <- row + 1 to 7)
         board.getCell(col, i) match
           case `cell` => // keep going since same color
-          case 0 =>
+          case Board.Empty =>
             // if space found then every piece on the other side must
             // be the same color
             for (j <- 0 until row)
@@ -126,7 +126,7 @@ object ScoreCalculator:
             for (j <- (0 until row).reverse)
               board.getCell(col, j) match
                 case `cell` => // keep going since same color
-                case 0 => break(false)
+                case Board.Empty => break(false)
                 case _ =>
                   for (k <- i + 1 to 7)
                     if (board.getCell(col, k) == 0) break(false)
@@ -142,17 +142,19 @@ object ScoreCalculator:
       for (i <- col + 2 to H.id by 2)
         board.getCell(i, row) match
           case `cell` => // keep going since same color
-          case 0 => // if space found then every piece on the other side must
-            // be the same color
+          case Board.Empty =>
+            // if space found then every piece on the other side must be the 
+            // same color
             for (j <- A.id to col - 2 by 2)
               if (board.getCell(j, row) != cell) break(false)
             break(true)
-          case _ => // if other color found then everything must be same color
-            // on other side or all set
+          case _ =>
+            // if other color found then everything must be same color on 
+            // other side or all set
             for (j <- (A.id to col - 2 by 2).reverse)
               board.getCell(j, row) match
                 case `cell` => // keep going since same color
-                case 0 => break(false)
+                case Board.Empty => break(false)
                 case _ =>
                   for (k <- i + 2 to H.id by 2)
                     if (board.getCell(k, row) == 0) break(false)

@@ -11,5 +11,5 @@ trait TurnTiming extends Player:
     totalTime += Calendar.getInstance().getTimeInMillis - now
     result
 
-  def timeInSeconds(): String =
+  def timeString: String =
     (totalTime.asInstanceOf[Double] / 1000).toString + " seconds"
