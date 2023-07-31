@@ -1,6 +1,6 @@
 package main.game
 
-object Column extends Enumeration {
+object Column extends Enumeration:
   type Column = Value
   val A: Value = Value(0)
   val B: Value = Value(2)
@@ -10,4 +10,3 @@ object Column extends Enumeration {
   val F: Value = Value(10)
   val G: Value = Value(12)
   val H: Value = Value(14)
-}
