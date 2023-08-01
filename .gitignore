@@ -1,2 +1,5 @@
-out
-/.idea/workspace.xml
+.bsp
+target
+.idea/workspace.xml
+/.idea/libraries/
+/.idea/modules/

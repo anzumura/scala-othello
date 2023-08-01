@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ScalaCompilerConfiguration">
+    <profile name="sbt 1" modules="scala-othello_4391" />
+    <profile name="sbt 2" modules="scala-othello.Othello">
+      <option name="deprecationWarnings" value="true" />
+      <option name="uncheckedWarnings" value="true" />
+      <option name="featureWarnings" value="true" />
+      <parameters>
+        <parameter value="-explain" />
+        <parameter value="-explain-types" />
+        <parameter value="-print-lines" />
+        <parameter value="-Xfatal-warnings" />
+        <parameter value="-Xmigration" />
+      </parameters>
+    </profile>
+  </component>
+</project>
