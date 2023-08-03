@@ -9,16 +9,15 @@ object Game:
   def begin(): Unit =
     val board = new Board
     board.initialSetup()
-    while {
+    while
       var state = GameState(board)
       // if there are no valid moves flip the color and see if the other player
       // has any
-      if (!state.hasMoves)
-        state = GameState(state)
-      val player = players(board.playerNumber)
+      if (!state.hasMoves) state = GameState(state)
+      val player = players(board.currentColor)
       player.printBoard(board, state)
       state.hasMoves && player.makeMove(board, state)
-    } do()
+    do ()
     players.foreach(p => println("Total time for " + p + ": " + p.timeString))
 
   @tailrec

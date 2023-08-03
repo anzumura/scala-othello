@@ -11,8 +11,8 @@ class HumanPlayer(color: PlayerColor.Value) extends Player(color):
       case "q" => false
       case _ => processMove(board, state, line)
 
-  private def processMove(board: Board, state: GameState, line: String)
-  : Boolean =
+  private def processMove(
+      board: Board, state: GameState, line: String): Boolean =
     if (line.matches("^[a-hA-H][1-8]$"))
       tryMove(board, state, line.charAt(0), line.substring(1, 2))
     else if (line.matches("^[1-8][a-hA-H]$"))
@@ -23,19 +23,20 @@ class HumanPlayer(color: PlayerColor.Value) extends Player(color):
         " valid moves)")
       makeMove(board, state)
 
-  private def tryMove(board: Board, state: GameState, col: Char, row: String)
-  : Boolean =
-  // convert from external interface to internal representation for columns
-  // and rows
-    if (doTryMove(board, state, Column.withName(col.toUpper.toString).id, row
-      .toInt - 1))
-      true
+  private def tryMove(
+      board: Board, state: GameState, col: Char, row: String): Boolean =
+    // convert from external interface to internal representation for columns
+    // and rows
+    if (
+      doTryMove(board, state, Column.withName(col.toUpper.toString).id,
+        row.toInt - 1)
+    ) true
     else
       println("  " + col.toUpper + row + " is not a valid move")
       makeMove(board, state)
 
-  private def doTryMove(board: Board, state: GameState, col: Int, row: Int)
-  : Boolean =
+  private def doTryMove(
+      board: Board, state: GameState, col: Int, row: Int): Boolean =
     state.isValid(col, row) && {
       board.setCell(col, row); true
     }

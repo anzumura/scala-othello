@@ -9,57 +9,54 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
   private var cachedValidMoves: IndexedSeq[(Int, Int)] = _
 
   def printSummary(): Unit =
-    println("\nscore black(" + BlackSymbol + "): " + totalBlack +
-      ", white(" + WhiteSymbol + "): " + totalWhite)
+    println("\nscore black(" + BlackSymbol + "): " + totalBlack + ", white(" +
+      WhiteSymbol + "): " + totalWhite)
     if (!hasMoves)
-      println("Game Over - " + (
-        if (totalBlack > totalWhite)
-          "black wins!"
-        else if (totalWhite > totalBlack)
-          "white wins!"
-        else
-          "draw"
-        ))
+      println("Game Over - " +
+        (if (totalBlack > totalWhite) "black wins!"
+         else if (totalWhite > totalBlack) "white wins!"
+         else "draw"))
 
-  def color: Int = board.turn
+  def color: Int = board.currentColor
 
-  def gameOver: Boolean = totalBlack == 0 || totalWhite == 0 || (totalWhite +
-    totalBlack) == 64
+  def gameOver: Boolean = totalBlack == 0 || totalWhite == 0 ||
+    (totalWhite + totalBlack) == 64
 
   def hasMoves: Boolean = validMoves.nonEmpty
 
   def isValid(col: Int, row: Int): Boolean = validMoves.contains((col, row))
 
   def getPoints(color: Int): Int =
-    if (color == Board.Black) totalBlack - totalWhite else totalWhite -
-      totalBlack
+    if (color == Board.Black) totalBlack - totalWhite
+    else totalWhite - totalBlack
 
   def validMoves: IndexedSeq[(Int, Int)] =
-    if (cachedValidMoves == null)
-      cachedValidMoves = for (i <- GameState.allMoves
-                              if (board.getCell(i._1, i._2) match
-                                case Black | White => false
-                                case _ => GameState.checkValid(board, i._1, i
-                                  ._2)
-                                ))
-      yield i
+    if (cachedValidMoves == null) cachedValidMoves = for (
+      i <- GameState.allMoves if (board.getCell(i._1, i._2) match
+        case Black | White => false
+        case _ => GameState.checkValid(board, i._1, i._2)
+      )
+    ) yield i
     cachedValidMoves
 
 object GameState:
   private val corner = IndexedSeq((A.id, 0), (H.id, 0), (A.id, 7), (H.id, 7))
-  private val horizontal = for (i <- C.id to F.id by 2; j <- IndexedSeq(0, 7)
-                                ) yield (i, j)
-  private val vertical = for (i <- IndexedSeq(A.id, H.id); j <- 2 to 5) yield
-    (i, j)
+  private val horizontal =
+    for (i <- C.id to F.id by 2; j <- IndexedSeq(0, 7))
+      yield (i, j)
+  private val vertical =
+    for (i <- IndexedSeq(A.id, H.id); j <- 2 to 5)
+      yield (i, j)
   private val center = for (i <- C.id to F.id by 2; j <- 2 to 5) yield (i, j)
-  private val nextToHorizontal = for (i <- C.id to F.id by 2; j <- IndexedSeq
-  (1, 6)) yield (i, j)
-  private val nextToVertical = for (i <- IndexedSeq(B.id, G.id); j <- 2 to 5)
-    yield (i, j)
-  private val nextToCorner = IndexedSeq((A.id, 1), (A.id, 6), (B.id, 0), (B
-    .id, 1),
-    (B.id, 6), (B.id, 7), (G.id, 0), (G.id, 1), (G.id, 6), (G.id, 7), (H.id,
-      1), (H.id, 6))
+  private val nextToHorizontal = for (
+    i <- C.id to F.id by 2; j <- IndexedSeq(1, 6)
+  ) yield (i, j)
+  private val nextToVertical =
+    for (i <- IndexedSeq(B.id, G.id); j <- 2 to 5)
+      yield (i, j)
+  private val nextToCorner =
+    IndexedSeq((A.id, 1), (A.id, 6), (B.id, 0), (B.id, 1), (B.id, 6), (B.id, 7),
+      (G.id, 0), (G.id, 1), (G.id, 6), (G.id, 7), (H.id, 1), (H.id, 6))
   // create 'allMoves' with potentially best moves first and use this for
   // generating validMoves to increase pruning with alphaBeta. Tests at 6 ply
   // showed full game time fall from 43 secs to 13 for black and 56 to 14 for
@@ -70,11 +67,10 @@ object GameState:
   def apply(board: Board): GameState =
     var totalBlack = 0
     var totalWhite = 0
-    for (i <- 0 to 7; j <- Column.values)
-      board.getCell(j.id, i) match
-        case Black => totalBlack += 1
-        case White => totalWhite += 1
-        case _ =>
+    for (i <- 0 to 7; j <- Column.values) board.getCell(j.id, i) match
+      case Black => totalBlack += 1
+      case White => totalWhite += 1
+      case _ =>
     new GameState(totalBlack, totalWhite, board)
 
   def apply(state: GameState): GameState =
@@ -85,46 +81,44 @@ object GameState:
     apply(new Board(state.board, move))
 
   private def checkValid(board: Board, col: Int, row: Int): Boolean =
-    (if (col < C.id)
-      checkHorizontal(board, col, row, 2)
-    else if (col > F.id)
-      checkHorizontal(board, col, row, -2)
-    else
-      checkHorizontal(board, col, row, 2) || checkHorizontal(board, col, row,
-        -2)) || (row match
-      case 0 | 1 => check(board, col, row, 0, 1)
-      case 6 | 7 => check(board, col, row, 0, -1)
-      case _ => check(board, col, row, 0, 1) || check(board, col, row, 0, -1))
-
-  private def checkHorizontal(board: Board, col: Int, row: Int,
-                              horizontal: Int) =
-    check(board, col, row, horizontal, 0) || (row match
-      case 0 | 1 => check(board, col, row, horizontal, 1)
-      case 6 | 7 => check(board, col, row, horizontal, -1)
-      case _ => check(board, col, row, horizontal, 1) ||
-        check(board, col, row, horizontal, -1)
+    (if (col < C.id) checkHorizontal(board, col, row, 2)
+     else if (col > F.id) checkHorizontal(board, col, row, -2)
+     else
+       checkHorizontal(board, col, row, 2) ||
+       checkHorizontal(board, col, row, -2)) ||
+      (row match
+        case 0 | 1 => check(board, col, row, 0, 1)
+        case 6 | 7 => check(board, col, row, 0, -1)
+        case _ => check(board, col, row, 0, 1) || check(board, col, row, 0, -1)
       )
 
+  private def checkHorizontal(board: Board, col: Int, row: Int,
+      horizontal: Int) = check(board, col, row, horizontal, 0) ||
+    (row match
+      case 0 | 1 => check(board, col, row, horizontal, 1)
+      case 6 | 7 => check(board, col, row, horizontal, -1)
+      case _ =>
+        check(board, col, row, horizontal, 1) ||
+        check(board, col, row, horizontal, -1)
+    )
+
   private def check(board: Board, col: Int, row: Int, horizontal: Int,
-                    vertical: Int): Boolean =
+      vertical: Int): Boolean =
     doCheck(board, col + horizontal, row + vertical, horizontal, vertical)
 
   private def doCheck(board: Board, col: Int, row: Int, horizontal: Int,
-                      vertical: Int): Boolean =
-  // make sure the next in this direction is the other color and then start
-  // looking for my color
-    board.getCell(col, row) == board.otherColor &&
-      findSameColor(board, col + horizontal, row + vertical, horizontal,
-        vertical)
+      vertical: Int): Boolean =
+    // make sure the next in this direction is the other color and then start
+    // looking for my color
+    board.getCell(col, row) == board.otherColor && findSameColor(board,
+      col + horizontal, row + vertical, horizontal, vertical)
 
   @tailrec
-  private def findSameColor(board: Board, col: Int, row: Int,
-                            horizontal: Int, vertical: Int): Boolean =
-    if (col < A.id || col > H.id || row < 0 || row > 7)
-      return false
+  private def findSameColor(board: Board, col: Int, row: Int, horizontal: Int,
+      vertical: Int): Boolean =
+    if (col < A.id || col > H.id || row < 0 || row > 7) return false
     val cell = board.getCell(col, row)
     if (cell == board.otherColor)
       findSameColor(board, col + horizontal, row + vertical, horizontal,
         vertical)
-    else
-      cell == board.turn
+    else cell == board.currentColor
