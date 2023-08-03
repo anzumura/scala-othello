@@ -14,7 +14,7 @@ object Game:
       // if there are no valid moves flip the color and see if the other player
       // has any
       if (!state.hasMoves) state = GameState(state)
-      val player = players(board.currentColor)
+      val player = players(board.currentColor - 1)
       player.printBoard(board, state)
       state.hasMoves && player.makeMove(board, state)
     do ()
