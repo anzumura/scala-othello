@@ -11,11 +11,10 @@ object Game:
     board.initialSetup()
     while
       var state = GameState(board)
-      // if there are no valid moves flip the color and see if the other player
-      // has any
+      // if there are no valid moves flip color and see if other player has any
       if (!state.hasMoves) state = GameState(state)
       val player = players(board.currentColor - 1)
-      player.printBoard(board, state)
+      print(player.printBoard(board, state))
       state.hasMoves && player.makeMove(board, state)
     do ()
     players.foreach(p => println("Total time for " + p + ": " + p.timeString))

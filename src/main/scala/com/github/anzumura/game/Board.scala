@@ -27,27 +27,29 @@ class Board:
 
   def otherColor: Int = turn ^ Flip
 
-  def printBoard(state: GameState = null, boarders: Boolean = true): Unit =
+  def printBoard(state: GameState = null, boarders: Boolean = true): String =
+    val result = new StringBuilder
     if (boarders)
-      println("\n" + Border)
-      println(LeftEdge + (Column.values mkString " ") + RightEdge)
-      println(Border)
+      result ++= "\n" + Border + "\n"
+      result ++= LeftEdge + (Column.values mkString " ") + RightEdge + "\n"
+      result ++= Border + "\n"
     for (i <- 1 to cells.length)
-      if (boarders) print("|" + i + "|")
-      for (j <- Column.values) printCell(j.id, i - 1, state)
-      println(if boarders then " |" + i + "|" else "")
+      if (boarders) result ++= "|" + i + "|"
+      for (j <- Column.values) result ++= printCell(j.id, i - 1, state)
+      result ++= (if boarders then " |" + i + "|\n" else "\n")
     if (boarders)
-      println(Border)
-      println(LeftEdge + (Column.values mkString " ") + RightEdge)
-      println(Border)
+      result ++= Border + "\n"
+      result ++= LeftEdge + (Column.values mkString " ") + RightEdge + "\n"
+      result ++= Border + "\n"
+    result.toString
 
-  private def printCell(col: Int, row: Int, state: GameState): Unit =
+  private def printCell(col: Int, row: Int, state: GameState): String =
     val cell = getCell(col, row)
     val char = cell match
       case Black => BlackSymbol
       case White => WhiteSymbol
       case _ => if (state != null && state.isValid(col, row)) '*' else '.'
-    print(" " + char)
+    " " + char
 
   def getCell(col: Int, row: Int): Int = (cells(row) & (Flip << col))
     .asInstanceOf[Char] >> col
@@ -110,15 +112,3 @@ object Board:
   private val RightEdge = " | |"
   // for flipping cells and changing the current turn
   private val Flip = 3
-
-  // create a Board populated from an Array of Array[Int] (not all rows need
-  // to be specified)
-  def apply(x: Array[Int]*): Board =
-    val b = new Board
-    var i = 0
-    for (row <- x)
-      var value = 0
-      for (cell <- row.reverse) value = (value << 2) + cell
-      b.cells(i) = value.asInstanceOf[Char]
-      i += 1
-    b

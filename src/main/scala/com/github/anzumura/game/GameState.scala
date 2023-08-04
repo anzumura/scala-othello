@@ -8,14 +8,17 @@ import scala.annotation.tailrec
 class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
   private var cachedValidMoves: IndexedSeq[(Int, Int)] = _
 
-  def printSummary(): Unit =
-    println("\nscore black(" + BlackSymbol + "): " + totalBlack + ", white(" +
+  def printSummary(): String =
+    val result = StringBuilder("\nscore black(" + BlackSymbol + "): " +
+      totalBlack + ", white(" +
       WhiteSymbol + "): " + totalWhite)
     if (!hasMoves)
-      println("Game Over - " +
-        (if (totalBlack > totalWhite) "black wins!"
-         else if (totalWhite > totalBlack) "white wins!"
-         else "draw"))
+      result ++= "\nGame Over - "
+      result ++= (if (totalBlack > totalWhite) "black wins!"
+                  else if (totalWhite > totalBlack) "white wins!"
+                  else "draw")
+    result += '\n'
+    result.toString
 
   def color: Int = board.currentColor
 
