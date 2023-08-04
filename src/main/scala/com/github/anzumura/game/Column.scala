@@ -9,3 +9,5 @@ object Column extends Enumeration:
   val F: Value = Value(10)
   val G: Value = Value(12)
   val H: Value = Value(14)
+
+  val ids: List[Int] = values.toList.map(c => c.id)

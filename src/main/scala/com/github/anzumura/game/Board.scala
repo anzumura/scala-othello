@@ -28,28 +28,25 @@ class Board:
   def otherColor: Int = turn ^ Flip
 
   def printBoard(state: GameState = null, boarders: Boolean = true): String =
-    val result = new StringBuilder
-    if (boarders)
-      result ++= "\n" + Border + "\n"
-      result ++= LeftEdge + (Column.values mkString " ") + RightEdge + "\n"
-      result ++= Border + "\n"
+    val res = new StringBuilder
+    val header = () =>
+      if (boarders)
+        res ++= Border
+        res ++= LeftEdge + Column.values.mkString(" ") + RightEdge
+        res ++= Border
+    header()
     for (i <- 1 to cells.length)
-      if (boarders) result ++= "|" + i + "|"
-      for (j <- Column.values) result ++= printCell(j.id, i - 1, state)
-      result ++= (if boarders then " |" + i + "|\n" else "\n")
-    if (boarders)
-      result ++= Border + "\n"
-      result ++= LeftEdge + (Column.values mkString " ") + RightEdge + "\n"
-      result ++= Border + "\n"
-    result.toString
+      res ++= (if boarders then s"|$i| " else " ")
+      res ++= Column.ids.map(printCell(_, i - 1, state)).mkString(" ")
+      res ++= (if boarders then s" |$i|\n" else "\n")
+    header()
+    res.toString
 
-  private def printCell(col: Int, row: Int, state: GameState): String =
-    val cell = getCell(col, row)
-    val char = cell match
+  private def printCell(col: Int, row: Int, state: GameState): Char =
+    getCell(col, row) match
       case Black => BlackSymbol
       case White => WhiteSymbol
       case _ => if (state != null && state.isValid(col, row)) '*' else '.'
-    " " + char
 
   def getCell(col: Int, row: Int): Int = (cells(row) & (Flip << col))
     .asInstanceOf[Char] >> col
@@ -107,8 +104,8 @@ object Board:
   val Black = 1
   val White = 2
   // for printing
-  private val Border = "+-+-----------------+-+"
+  private val Border = "+-+-----------------+-+\n"
   private val LeftEdge = "| | "
-  private val RightEdge = " | |"
+  private val RightEdge = " | |\n"
   // for flipping cells and changing the current turn
   private val Flip = 3

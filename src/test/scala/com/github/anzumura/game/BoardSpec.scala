@@ -25,10 +25,10 @@ class BoardSpec extends AnyFlatSpec with should.Matchers:
   }
 
   it should "print boarders by default" in {
-    val boarder = "\n+-+-----------------+-+\n"
-    val header = boarder + "| | A B C D E F G H | |" + boarder
+    val boarder = "+-+-----------------+-+\n"
+    val header = boarder + "| | A B C D E F G H | |\n" + boarder
     val expected = header + (for (i <- 1 to 8)
-      yield s"|$i|" + " .".repeat(8) + s" |$i|").mkString("\n") + header
+      yield s"|$i|" + " .".repeat(8) + s" |$i|\n").mkString("") + header
     board.printBoard() shouldBe expected
   }
 
