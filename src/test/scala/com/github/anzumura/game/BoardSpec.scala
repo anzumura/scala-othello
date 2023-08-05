@@ -13,11 +13,7 @@ class BoardSpec extends AnyFlatSpec with should.Matchers:
   behavior of "Board"
 
   it should "start with current player set to Black" in {
-    board.currentColor shouldBe Board.Black
-  }
-
-  it should "start with other player set to White" in {
-    board.otherColor shouldBe Board.White
+    board.color shouldBe Color.Black
   }
 
   it should "start empty" in {

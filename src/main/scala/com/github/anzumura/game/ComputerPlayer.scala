@@ -6,7 +6,7 @@ import scala.annotation.tailrec
 import scala.io.StdIn.readLine
 import scala.util.Random
 
-class ComputerPlayer(color: PlayerColor.Value) extends Player(color):
+class ComputerPlayer(color: Color) extends Player(color):
   private val gen = new Random()
   private val search = getSearch
   private val searchDebug = 6
@@ -30,7 +30,7 @@ class ComputerPlayer(color: PlayerColor.Value) extends Player(color):
         print(".")
         move += 1
       val score = ScoreCalculator.minLevel(search, GameState(state, i),
-        bestScore, ScoreCalculator.WIN, board.currentColor)
+        bestScore, ScoreCalculator.WIN, board.color.id)
       if (bestMove == null || score > bestScore)
         bestScore = score
         bestMove = i
@@ -40,7 +40,7 @@ class ComputerPlayer(color: PlayerColor.Value) extends Player(color):
   private def getTime: String = SimpleDateFormat("HH:mm:ss")
     .format(Calendar.getInstance().getTime)
 
-  override def toString: String = super.toString + " with search=" + search
+  override val toString: String = super.toString + " with search=" + search
 
   @tailrec
   private def getSearch: Int =

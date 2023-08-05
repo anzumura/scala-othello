@@ -8,11 +8,11 @@ class ColumnSpec extends AnyFlatSpec with should.Matchers:
   behavior of "Column"
 
   it should "have expected values" in {
-    Column.values shouldBe Array(A, B, C, D, E, F, G, H)
+    values shouldBe Array(A, B, C, D, E, F, G, H)
   }
 
   it should "have expected ids" in {
-    Column.ids shouldBe Array(0, 2, 4, 6, 8, 10, 12, 14)
+    ids shouldBe Array(0, 2, 4, 6, 8, 10, 12, 14)
   }
 
   it should "allow creation from upper case Char name" in {

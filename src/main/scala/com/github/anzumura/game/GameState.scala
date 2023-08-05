@@ -7,11 +7,11 @@ import scala.annotation.tailrec
 
 class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
   private var cachedValidMoves: IndexedSeq[(Int, Int)] = _
+  private val blackMsg = "\nscore black(" + Color.Black.symbol + "): "
+  private val whiteMsg = "\nscore white(" + Color.White.symbol + "): "
 
   def printSummary(): String =
-    val result = StringBuilder("\nscore black(" + BlackSymbol + "): " +
-      totalBlack + ", white(" +
-      WhiteSymbol + "): " + totalWhite)
+    val result = StringBuilder(blackMsg + totalBlack + whiteMsg + totalWhite)
     if (!hasMoves)
       result ++= "\nGame Over - "
       result ++= (if (totalBlack > totalWhite) "black wins!"
@@ -19,8 +19,6 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
                   else "draw")
     result += '\n'
     result.toString
-
-  def color: Int = board.currentColor
 
   def gameOver: Boolean = totalBlack == 0 || totalWhite == 0 ||
     (totalWhite + totalBlack) == 64
@@ -30,7 +28,7 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
   def isValid(col: Int, row: Int): Boolean = validMoves.contains((col, row))
 
   def getPoints(color: Int): Int =
-    if (color == Board.Black) totalBlack - totalWhite
+    if (color == 1) totalBlack - totalWhite
     else totalWhite - totalBlack
 
   def validMoves: IndexedSeq[(Int, Int)] =
@@ -113,7 +111,7 @@ object GameState:
       vertical: Int): Boolean =
     // make sure the next in this direction is the other color and then start
     // looking for my color
-    board.getCell(col, row) == board.otherColor && findSameColor(board,
+    board.getCell(col, row) == board.color.other.id && findSameColor(board,
       col + horizontal, row + vertical, horizontal, vertical)
 
   @tailrec
@@ -121,7 +119,7 @@ object GameState:
       vertical: Int): Boolean =
     if (col < A.id || col > H.id || row < 0 || row > 7) return false
     val cell = board.getCell(col, row)
-    if (cell == board.otherColor)
+    if (cell == board.color.other.id)
       findSameColor(board, col + horizontal, row + vertical, horizontal,
         vertical)
-    else cell == board.currentColor
+    else cell == board.color.id

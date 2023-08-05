@@ -2,9 +2,9 @@ package com.github.anzumura.game
 
 import scala.io.StdIn.readLine
 
-class HumanPlayer(color: PlayerColor.Value) extends Player(color):
+class HumanPlayer(color: Color) extends Player(color):
   override def makeMove(board: Board, state: GameState): Boolean =
-    print("enter " + board.currentPlayer + "'s move: ")
+    print("enter " + board.color + "'s move: ")
     val line = readLine()
     line match
       case "v" => showValid = !showValid; true

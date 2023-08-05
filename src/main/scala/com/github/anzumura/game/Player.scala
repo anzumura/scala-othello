@@ -1,10 +1,6 @@
 package com.github.anzumura.game
 
-object PlayerColor extends Enumeration:
-  type Color = Value
-  val Black, White = Value
-
-abstract class Player(val color: PlayerColor.Value):
+abstract class Player(val color: Color):
   protected var showValid = false
 
   def makeMove(board: Board, state: GameState): Boolean
