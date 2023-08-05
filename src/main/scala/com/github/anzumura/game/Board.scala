@@ -17,29 +17,24 @@ class Board:
     this(board)
     setCell(move._1, move._2)
 
+  def currentColor: Int = turn
+
+  def otherColor: Int = turn ^ Flip
+
   def initialSetup(): Unit =
     cells(3) = ((White << D.id) + (Black << E.id)).asInstanceOf[Char]
     cells(4) = ((Black << D.id) + (White << E.id)).asInstanceOf[Char]
 
-  def currentColor: Int = turn
-
   def flipColor(): Unit = turn = otherColor
-
-  def otherColor: Int = turn ^ Flip
 
   def printBoard(state: GameState = null, boarders: Boolean = true): String =
     val res = new StringBuilder
-    val header = () =>
-      if (boarders)
-        res ++= Border
-        res ++= LeftEdge + Column.values.mkString(" ") + RightEdge
-        res ++= Border
-    header()
+    if (boarders) res ++= header
     for (i <- 1 to cells.length)
       res ++= (if boarders then s"|$i| " else " ")
       res ++= Column.ids.map(printCell(_, i - 1, state)).mkString(" ")
       res ++= (if boarders then s" |$i|\n" else "\n")
-    header()
+    if (boarders) res ++= header
     res.toString
 
   private def printCell(col: Int, row: Int, state: GameState): Char =
@@ -109,3 +104,6 @@ object Board:
   private val RightEdge = " | |\n"
   // for flipping cells and changing the current turn
   private val Flip = 3
+
+  private val header = Border + LeftEdge + Column.values.mkString(" ") +
+    RightEdge + Border

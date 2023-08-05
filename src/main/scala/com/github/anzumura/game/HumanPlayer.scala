@@ -27,10 +27,7 @@ class HumanPlayer(color: PlayerColor.Value) extends Player(color):
       board: Board, state: GameState, col: Char, row: String): Boolean =
     // convert from external interface to internal representation for columns
     // and rows
-    if (
-      doTryMove(board, state, Column.withName(col.toUpper.toString).id,
-        row.toInt - 1)
-    ) true
+    if (doTryMove(board, state, Column(col).id, row.toInt - 1)) true
     else
       println("  " + col.toUpper + row + " is not a valid move")
       makeMove(board, state)

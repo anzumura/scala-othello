@@ -1,13 +1,13 @@
 package com.github.anzumura.game
 
-object Column extends Enumeration:
-  val A: Value = Value(0)
-  val B: Value = Value(2)
-  val C: Value = Value(4)
-  val D: Value = Value(6)
-  val E: Value = Value(8)
-  val F: Value = Value(10)
-  val G: Value = Value(12)
-  val H: Value = Value(14)
+enum Column:
+  case A, B, C, D, E, F, G, H
 
-  val ids: List[Int] = values.toList.map(c => c.id)
+  val id: Int = ordinal * 2
+
+object Column:
+  val ids: Array[Int] = values.map(_.id)
+
+  def apply(id: Int): Column = Column.fromOrdinal(id / 2)
+
+  def apply(c: Char): Column = Column.valueOf(c.toUpper.toString)
