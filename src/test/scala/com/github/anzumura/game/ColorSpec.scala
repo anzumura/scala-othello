@@ -1,10 +1,10 @@
 package com.github.anzumura.game
 
+import com.github.anzumura.game.Color.*
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should
+import org.scalatest.matchers.should.Matchers
 
-class ColorSpec extends AnyFlatSpec with should.Matchers:
-  import com.github.anzumura.game.Color.*
+class ColorSpec extends AnyFlatSpec with Matchers:
   behavior of "Color"
 
   it should "have expected values" in {

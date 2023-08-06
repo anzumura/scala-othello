@@ -27,13 +27,13 @@ class HumanPlayer(color: Color) extends Player(color):
       board: Board, state: GameState, col: Char, row: String): Boolean =
     // convert from external interface to internal representation for columns
     // and rows
-    if (doTryMove(board, state, Column(col).id, row.toInt - 1)) true
+    if (doTryMove(board, state, Column(col), row.toInt - 1)) true
     else
       println("  " + col.toUpper + row + " is not a valid move")
       makeMove(board, state)
 
   private def doTryMove(
-      board: Board, state: GameState, col: Int, row: Int): Boolean =
+      board: Board, state: GameState, col: Column, row: Int): Boolean =
     state.isValid(col, row) && {
-      board.setCell(col, row); true
+      board.set(col, row); true
     }

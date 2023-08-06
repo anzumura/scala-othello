@@ -1,13 +1,26 @@
 package com.github.anzumura.game
 
-enum Column:
+import scala.annotation.targetName
+
+enum Column extends Ordered[Column]:
   case A, B, C, D, E, F, G, H
 
   val id: Int = ordinal * 2
 
+  def canAdd(x: Int): Boolean =
+    val res = ordinal + x
+    res < Column.values.length && res >= 0
+
+  @targetName("plus") def +(x: Int): Column =
+    Column.fromOrdinal(ordinal + x)
+
+  @targetName("minus") def -(x: Int): Column =
+    Column.fromOrdinal(ordinal - x)
+
+  def to(end: Column): IndexedSeq[Column] =
+    (ordinal to end.ordinal).map(Column.fromOrdinal)
+
+  override def compare(that: Column): Int = this.ordinal - that.ordinal
+
 object Column:
-  val ids: Array[Int] = values.map(_.id)
-
-  def apply(id: Int): Column = Column.fromOrdinal(id / 2)
-
   def apply(c: Char): Column = Column.valueOf(c.toUpper.toString)

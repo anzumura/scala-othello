@@ -1,9 +1,9 @@
 package com.github.anzumura.game
 
 import org.scalatest.flatspec.AnyFlatSpec
-import org.scalatest.matchers.should
+import org.scalatest.matchers.should.Matchers
 
-class ColumnSpec extends AnyFlatSpec with should.Matchers:
+class ColumnSpec extends AnyFlatSpec with Matchers:
   import com.github.anzumura.game.Column.*
   behavior of "Column"
 
@@ -12,7 +12,7 @@ class ColumnSpec extends AnyFlatSpec with should.Matchers:
   }
 
   it should "have expected ids" in {
-    ids shouldBe Array(0, 2, 4, 6, 8, 10, 12, 14)
+    values.map(_.id) shouldBe Array(0, 2, 4, 6, 8, 10, 12, 14)
   }
 
   it should "allow creation from upper case Char name" in {
@@ -23,6 +23,30 @@ class ColumnSpec extends AnyFlatSpec with should.Matchers:
     Column('c') shouldBe C
   }
 
-  it should "allow creation from Int id" in {
-    Column(12) shouldBe G
+  it should "compare values" in {
+    A should be < B
+    H should be > C
+  }
+
+  it should "allow checking addition via canAdd" in {
+    D.canAdd(4) shouldBe true
+    D.canAdd(5) shouldBe false
+    B.canAdd(-1) shouldBe true
+    B.canAdd(-2) shouldBe false
+  }
+
+  it should "support addition" in {
+    A + 2 shouldBe C
+    G + 1 shouldBe H
+  }
+
+  it should "support subtraction" in {
+    B - 1 shouldBe A
+    H - 2 shouldBe F
+  }
+
+  it should "support generating a range" in {
+    D to F shouldBe Vector(D, E, F)
+    H to B shouldBe Vector()
+    C to C shouldBe Vector(C)
   }

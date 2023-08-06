@@ -18,7 +18,7 @@ object ScoreCalculator:
 
   @tailrec
   private def maxLevel(depth: Int, state: GameState, alpha: Int, beta: Int,
-      color: Int): Int =
+      color: Color): Int =
     if (state.gameOver) finalScore(state.getPoints(color))
     else if (depth < 2) checkScore(state.board, color)
     else if (!state.hasMoves)
@@ -37,8 +37,8 @@ object ScoreCalculator:
       newAlpha
 
   @tailrec
-  def minLevel(
-      depth: Int, state: GameState, alpha: Int, beta: Int, color: Int): Int =
+  def minLevel(depth: Int, state: GameState, alpha: Int, beta: Int,
+      color: Color): Int =
     if (state.gameOver) finalScore(state.getPoints(color))
     else if (depth < 2) checkScore(state.board, color)
     else if (!state.hasMoves)
@@ -57,28 +57,27 @@ object ScoreCalculator:
       newBeta
 
   // not private because called by tests
-  private def scoreCell(myColor: Boolean, col: Int, row: Int, board: Board,
-      cell: Int): Int =
+  private def scoreCell(myColor: Boolean, col: Column, row: Int, board: Board,
+      color: Color): Int =
     (if (isCorner(col, row))
        CORNER_SCORE
-     else if (isSafeEdge(col, row, board, cell))
+     else if (isSafeEdge(col, row, board, color))
        SAFE_EDGE_SCORE
-     else if (isEdge(col, row, board, cell))
+     else if (isEdge(col, row, board, color))
        EDGE_SCORE
-     else if (isCenter(col, row, board, cell))
+     else if (isCenter(col, row, board, color))
        CENTER_SCORE
      else if (isNextToEdge(col, row, board))
        NEXT_TO_EDGE
      else
        NEXT_TO_CORNER) * (if (myColor) 1 else -1)
 
-  private def checkScore(board: Board, color: Int): Int =
-    var score = 0
-    for (i <- 0 to 7; j <- Column.values)
-      val cell = board.getCell(j.id, i)
-      score += (if (cell > 0) scoreCell(cell == color, j.id, i, board, cell)
-                else 0)
-    score
+  private def checkScore(board: Board, color: Color): Int =
+    (for (i <- 0 to 7; j <- Column.values)
+      yield board
+        .get(j, i)
+        .map(c => scoreCell(c == color, j, i, board, color))
+        .getOrElse(0)).sum
 
   private def finalScore(points: Int): Int =
     if (points > 0)
@@ -88,130 +87,132 @@ object ScoreCalculator:
     else
       0
 
-  private def isCorner(col: Int, row: Int): Boolean =
-    col == A.id && (row == 0 || row == 7) ||
-      col == H.id && (row == 0 || row == 7)
+  private def isCorner(col: Column, row: Int): Boolean =
+    col == A && (row == 0 || row == 7) ||
+      col == H && (row == 0 || row == 7)
 
-  private def isSafeEdge(col: Int, row: Int, board: Board, cell: Int): Boolean =
-    (col == A.id || col == H.id) && checkVertical(col, row, board, cell) ||
-      (row == 0 || row == 7) && checkHorizontal(col, row, board, cell) ||
-      (col == B.id && row == 1 && checkSafeNextToCorner(board, cell, col, row,
-        -2, -1)) ||
-      (col == B.id && row == 6 && checkSafeNextToCorner(board, cell, col, row,
-        -2, 1)) ||
-      (col == G.id && row == 1 && checkSafeNextToCorner(board, cell, col, row,
-        2, -1)) ||
-      (col == G.id && row == 6 && checkSafeNextToCorner(board, cell, col, row,
-        2, 1))
+  private def isSafeEdge(
+      col: Column, row: Int, board: Board, color: Color): Boolean =
+    (col == A || col == H) && checkVertical(col, row, board, color) ||
+      (row == 0 || row == 7) && checkHorizontal(col, row, board, color) ||
+      (col == B && row == 1 && checkSafeNextToCorner(board, color, col, row, -1,
+        -1)) ||
+      (col == B && row == 6 && checkSafeNextToCorner(board, color, col, row, -1,
+        1)) ||
+      (col == G && row == 1 && checkSafeNextToCorner(board, color, col, row, 1,
+        -1)) ||
+      (col == G && row == 6 && checkSafeNextToCorner(board, color, col, row, 1,
+        1))
 
   private def checkVertical(
-      col: Int, row: Int, board: Board, cell: Int): Boolean =
+      col: Column, row: Int, board: Board, color: Color): Boolean =
     boundary:
       for (i <- row + 1 to 7)
-        board.getCell(col, i) match
-          case `cell` => // keep going since same color
-          case Board.Empty =>
+        board.get(col, i) match
+          case Some(x) if x == color => // keep going since same color
+          case None =>
             // if space found then every piece on the other side must
             // be the same color
             for (j <- 0 until row)
-              if (board.getCell(col, j) != cell) break(false)
+              if (!board.get(col, j).contains(color)) break(false)
             break(true)
           case _ =>
             // if other color found then everything must be same color
             // on other side or all set
             for (j <- (0 until row).reverse)
-              board.getCell(col, j) match
-                case `cell` => // keep going since same color
-                case Board.Empty => break(false)
+              board.get(col, j) match
+                case Some(x) if x == color => // keep going since same color
+                case None => break(false)
                 case _ =>
                   for (k <- i + 1 to 7)
-                    if (board.getCell(col, k) == 0) break(false)
+                    if (board.get(col, k).isEmpty) break(false)
                   for (l <- 0 until j)
-                    if (board.getCell(col, l) == 0) break(false)
+                    if (board.get(col, l).isEmpty) break(false)
                   break(true)
             break(true)
       true
 
   private def checkHorizontal(
-      col: Int, row: Int, board: Board, cell: Int): Boolean =
+      col: Column, row: Int, board: Board, color: Color): Boolean =
+    if (col == A || col == H) return true
     boundary:
-      for (i <- col + 2 to H.id by 2)
-        board.getCell(i, row) match
-          case `cell` => // keep going since same color
-          case Board.Empty =>
+      for (i <- col + 1 to H)
+        board.get(i, row) match
+          case Some(x) if x == color => // keep going since same color
+          case None =>
             // if space found then every piece on the other side must be the
             // same color
-            for (j <- A.id to col - 2 by 2)
-              if (board.getCell(j, row) != cell) break(false)
+            for (j <- A to col - 1)
+              if (!board.get(j, row).contains(color)) break(false)
             break(true)
           case _ =>
             // if other color found then everything must be same color on
             // other side or all set
-            for (j <- (A.id to col - 2 by 2).reverse)
-              board.getCell(j, row) match
-                case `cell` => // keep going since same color
-                case Board.Empty => break(false)
+            for (j <- (A to col - 1).reverse)
+              board.get(j, row) match
+                case Some(x) if x == color => // keep going since same color
+                case None => break(false)
                 case _ =>
-                  for (k <- i + 2 to H.id by 2)
-                    if (board.getCell(k, row) == 0) break(false)
-                  for (l <- A.id to j - 2 by 2)
-                    if (board.getCell(l, row) == 0) break(false)
+                  if (i.canAdd(1))
+                    for (k <- i + 1 to H)
+                      if (board.get(k, row).isEmpty) break(false)
+                  if (j.canAdd(-1))
+                    for (l <- A to j - 1)
+                      if (board.get(l, row).isEmpty) break(false)
                   break(true)
             break(true)
       true
 
-  private def isEdge(col: Int, row: Int, board: Board, cell: Int): Boolean =
-    (col == A.id || col == H.id) && row > 1 && row < 6 ||
-      (row == 0 || row == 7) && col > B.id && col < G.id ||
+  private def isEdge(
+      col: Column, row: Int, board: Board, color: Color): Boolean =
+    (col == A || col == H) && row > 1 && row < 6 ||
+      (row == 0 || row == 7) && col > B && col < G ||
       // treat edge cells next to corners that are already taken as normal
       // edge cells
-      ((col == A.id && row == 1 || col == B.id && row == 0) && board.getCell(
-        A.id, 0) != 0) ||
-      ((col == A.id && row == 6 || col == B.id && row == 7) && board.getCell(
-        A.id, 7) != 0) ||
-      ((col == H.id && row == 1 || col == G.id && row == 0) && board.getCell(
-        H.id, 0) != 0) ||
-      ((col == H.id && row == 6 || col == G.id && row == 7) && board.getCell(
-        H.id, 7) != 0)
+      ((col == A && row == 1 || col == B && row == 0) && board.has(A, 0)) ||
+      ((col == A && row == 6 || col == B && row == 7) && board.has(A, 7)) ||
+      ((col == H && row == 1 || col == G && row == 0) && board.has(H, 0)) ||
+      ((col == H && row == 6 || col == G && row == 7) && board.has(H, 7))
 
-  private def isCenter(col: Int, row: Int, board: Board, cell: Int): Boolean =
-    col > B.id && col < G.id && row > 1 && row < 6 ||
+  private def isCenter(
+      col: Column, row: Int, board: Board, color: Color): Boolean =
+    col > B && col < G && row > 1 && row < 6 ||
       // treat cells next to edges as center if the edges are already taken
-      (col == B.id && checkSide(board, cell, col, row, -2, 0)) ||
-      (col == G.id && checkSide(board, cell, col, row, 2, 0)) ||
-      (row == 1 && checkSide(board, cell, col, row, 0, -1)) ||
-      (row == 6 && checkSide(board, cell, col, row, 0, 1))
+      (col == B && checkSide(board, color, col, row, -1, 0)) ||
+      (col == G && checkSide(board, color, col, row, 1, 0)) ||
+      (row == 1 && checkSide(board, color, col, row, 0, -1)) ||
+      (row == 6 && checkSide(board, color, col, row, 0, 1))
 
-  private def isNextToEdge(col: Int, row: Int, board: Board): Boolean =
-    (col == B.id || col == G.id) && row > 1 && row < 6 ||
-      (row == 1 || row == 6) && col > B.id && col < G.id ||
+  private def isNextToEdge(col: Column, row: Int, board: Board): Boolean =
+    (col == B || col == G) && row > 1 && row < 6 ||
+      (row == 1 || row == 6) && col > B && col < G ||
       // treat diagonal next to corners as just 'next to edge' if the corner
       // is already taken
-      (col == B.id && row == 1 && board.getCell(A.id, 0) != 0) ||
-      (col == B.id && row == 6 && board.getCell(A.id, 7) != 0) ||
-      (col == G.id && row == 1 && board.getCell(H.id, 0) != 0) ||
-      (col == G.id && row == 6 && board.getCell(H.id, 7) != 0)
+      (col == B && row == 1 && board.get(A, 0).nonEmpty) ||
+      (col == B && row == 6 && board.get(A, 7).nonEmpty) ||
+      (col == G && row == 1 && board.get(H, 0).nonEmpty) ||
+      (col == G && row == 6 && board.get(H, 7).nonEmpty)
 
-  private def checkSafeNextToCorner(board: Board, cell: Int, col: Int, row: Int,
-      colMove: Int, rowMove: Int): Boolean =
-    board.getCell(col + colMove, row) == cell &&
-      board.getCell(col, row + rowMove) == cell &&
-      board.getCell(col + colMove, row + rowMove) == cell &&
-      (board.getCell(col - colMove, row + rowMove) == cell ||
-        board.getCell(col + colMove, row - rowMove) == cell ||
-        (board.getCell(col - colMove, row + rowMove) != 0 &&
-          board.getCell(col + colMove, row - rowMove) != 0))
+  private def checkSafeNextToCorner(board: Board, color: Color, col: Column,
+      row: Int, colMove: Int, rowMove: Int): Boolean =
+    board.get(col + colMove, row).contains(color) &&
+      board.get(col, row + rowMove).contains(color) &&
+      board.get(col + colMove, row + rowMove).contains(color) &&
+      (board.get(col - colMove, row + rowMove).contains(color) ||
+        board.get(col + colMove, row - rowMove).contains(color) ||
+        (board.get(col - colMove, row + rowMove).nonEmpty &&
+          board.get(col + colMove, row - rowMove).nonEmpty))
 
-  private def checkSide(board: Board, cell: Int, col: Int, row: Int,
+  private def checkSide(board: Board, color: Color, col: Column, row: Int,
       colMove: Int, rowMove: Int): Boolean =
     // to keep it simple consider this center if adjacent edge is same color or
     // adjacent edge is op color and both of the diagonal edges are set (ie all
     // three relevant edges are set)
-    board.getCell(col + colMove, row + rowMove) match
-      case `cell` => true
-      case 0 => false
+    board.get(col + colMove, row + rowMove) match
+      case Some(x) if x == color => true
+      case None => false
       case _ =>
-        (colMove != 0 && board.getCell(col + colMove, row + 1) != 0 &&
-          board.getCell(col + colMove, row - 1) != 0) ||
-        (rowMove != 0 && board.getCell(col + 2, row + rowMove) != 0 &&
-          board.getCell(col - 2, row + rowMove) != 0)
+        (colMove != 0 && board.get(col + colMove, row + 1).nonEmpty &&
+          board.get(col + colMove, row - 1).nonEmpty) ||
+        (rowMove != 0 && board.get(col + 1, row + rowMove).nonEmpty &&
+          board.get(col - 1, row + rowMove).nonEmpty)

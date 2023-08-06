@@ -7,6 +7,13 @@
       <list />
     </option>
     <option name="testKind" value="All in package" />
+    <option name="classBuf">
+      <list>
+        <option value="com.github.anzumura.game.BoardSpec" />
+        <option value="com.github.anzumura.game.ColorSpec" />
+        <option value="com.github.anzumura.game.ColumnSpec" />
+      </list>
+    </option>
     <option name="shortenClasspath" value="NONE" />
     <option name="testPackagePath" value="com.github.anzumura.game" />
     <method v="2">

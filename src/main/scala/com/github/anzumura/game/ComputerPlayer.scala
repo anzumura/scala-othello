@@ -15,12 +15,12 @@ class ComputerPlayer(color: Color) extends Player(color):
     val move =
       if (search == 0) state.validMoves(gen.nextInt(state.validMoves.length))
       else findMove(board, state)
-    board.setCell(move._1, move._2)
-    println("\n" + color + " played at: " + Column(move._1) + (move._2 + 1))
+    board.set(move(0), move(1))
+    println("\n" + color + " played at: " + move(0) + (move(1) + 1))
     true
 
-  private def findMove(board: Board, state: GameState): (Int, Int) =
-    var bestMove: (Int, Int) = null
+  private def findMove(board: Board, state: GameState): (Column, Int) =
+    var bestMove: (Column, Int) = null
     var bestScore = -ScoreCalculator.WIN
     var move = 1
     if (search > searchDebug)
@@ -30,7 +30,7 @@ class ComputerPlayer(color: Color) extends Player(color):
         print(".")
         move += 1
       val score = ScoreCalculator.minLevel(search, GameState(state, i),
-        bestScore, ScoreCalculator.WIN, board.color.id)
+        bestScore, ScoreCalculator.WIN, board.color)
       if (bestMove == null || score > bestScore)
         bestScore = score
         bestMove = i

@@ -4,94 +4,99 @@ import com.github.anzumura.game.Column.*
 
 class Board:
   import Board.*
+  import com.github.anzumura.game.Color.*
 
   private val cells = new Array[Char](8)
-  private var turn = Color.Black
+  private var turn = Black
 
   def this(board: Board) =
     this()
     this.turn = board.turn
     for (i <- cells.indices) this.cells(i) = board.cells(i)
 
-  def this(board: Board, move: (Int, Int)) =
+  def this(board: Board, move: (Column, Int)) =
     this(board)
-    setCell(move._1, move._2)
+    set(move(0), move(1))
 
   def color: Color = turn
 
   def initialSetup(): Unit =
-    cells(3) = ((White << D.id) + (Black << E.id)).asInstanceOf[Char]
-    cells(4) = ((Black << D.id) + (White << E.id)).asInstanceOf[Char]
+    turn = Black
+    (0 to 2).foreach(cells(_) = 0)
+    cells(3) = ((White.id << D.id) + (Black.id << E.id)).asInstanceOf[Char]
+    cells(4) = ((Black.id << D.id) + (White.id << E.id)).asInstanceOf[Char]
+    (5 to 7).foreach(cells(_) = 0)
 
   def flipColor(): Unit = turn = turn.other
 
-  def printBoard(state: GameState = null, boarders: Boolean = true): String =
+  def print(state: GameState = null, boarders: Boolean = true): String =
     val res = new StringBuilder
     if (boarders) res ++= header
     for (i <- 1 to cells.length)
       res ++= (if boarders then s"|$i| " else " ")
-      res ++= Column.ids.map(printCell(_, i - 1, state)).mkString(" ")
+      res ++= Column.values.map(printCell(_, i - 1, state)).mkString(" ")
       res ++= (if boarders then s" |$i|\n" else "\n")
     if (boarders) res ++= header
     res.toString
 
-  private def printCell(col: Int, row: Int, state: GameState): Char =
-    getCell(col, row) match
-      case Black => Color.Black.symbol
-      case White => Color.White.symbol
-      case _ => if (state != null && state.isValid(col, row)) '*' else '.'
+  def get(col: Column, row: Int): Option[Color] =
+    (cells(row) & (Flip << col.id)).asInstanceOf[Char] >> col.id match
+      case Black.id => Option(Black)
+      case White.id => Option(White)
+      case _ => Option.empty[Color]
 
-  def getCell(col: Int, row: Int): Int = (cells(row) & (Flip << col))
-    .asInstanceOf[Char] >> col
-
-  def setCell(col: Int, row: Int): Unit =
-    val x = (cells(row) | (Flip << col)).asInstanceOf[Char]
-    cells(row) = (x ^ (turn.other.id << col)).asInstanceOf[Char]
+  def set(col: Column, row: Int): Unit =
+    val x = (cells(row) | (Flip << col.id)).asInstanceOf[Char]
+    cells(row) = (x ^ (turn.other.id << col.id)).asInstanceOf[Char]
     calcFlips(col, row)
     flipColor()
 
-  private def calcFlips(col: Int, row: Int): Unit =
-    if (col > B.id) flipHorizontal(col, row, -2)
-    if (col < G.id) flipHorizontal(col, row, 2)
+  def has(col: Column, row: Int): Boolean = get(col, row).nonEmpty
+
+  private def printCell(col: Column, row: Int, state: GameState): Char =
+    get(col, row) match
+      case Some(c) => c.symbol
+      case _ => if (state != null && state.isValid(col, row)) '*' else '.'
+
+  private def calcFlips(col: Column, row: Int): Unit =
+    if (col > B) flipHorizontal(col, row, -1)
+    if (col < G) flipHorizontal(col, row, 1)
     if (row > 1) flipDirection(col, row, 0, -1)
     if (row < 6) flipDirection(col, row, 0, 1)
 
-  private def flipHorizontal(col: Int, row: Int, horizontal: Int): Unit =
+  private def flipHorizontal(col: Column, row: Int, horizontal: Int): Unit =
     flipDirection(col, row, horizontal, 0)
     if (row > 1) flipDirection(col, row, horizontal, -1)
     if (row < 6) flipDirection(col, row, horizontal, 1)
 
-  private def flipDirection(
-      col: Int, row: Int, horizontal: Int, vertical: Int): Unit =
+  private def flipDirection(col: Column, row: Int, horizontal: Int,
+      vertical: Int): Unit =
     doFlipDirection(col + horizontal, row + vertical, horizontal, vertical)
 
-  private def doFlipDirection(col: Int, row: Int, horizontal: Int,
+  private def doFlipDirection(col: Column, row: Int, horizontal: Int,
       vertical: Int): Unit =
     if (
-      getCell(col, row) != turn.id &&
-      flipFound(col + horizontal, row + vertical, horizontal, vertical)
+      !get(col, row).contains(turn) && flipFound(col, row, horizontal, vertical)
     ) flipCell(col, row)
 
-  private def flipFound(
-      col: Int, row: Int, horizontal: Int, vertical: Int): Boolean =
-    if (col < A.id || col > H.id || row < 0 || row > 7) return false
-    val cell = getCell(col, row)
+  private def flipFound(colIn: Column, rowIn: Int, horizontal: Int,
+      vertical: Int): Boolean =
+    val row = rowIn + vertical
+    if (!colIn.canAdd(horizontal) || row < 0 || row > 7) return false
+    val col = colIn + horizontal
+    val cell = get(col, row)
     // while cells are opposite color then recurse until my color is found
-    if (cell == turn.other.id)
-      if (flipFound(col + horizontal, row + vertical, horizontal, vertical))
+    if (cell.contains(turn.other))
+      if (flipFound(col, row, horizontal, vertical))
         flipCell(col, row) // flip on the way back
         return true
       return false
-    cell == turn.id
+    cell.contains(turn)
 
-  private def flipCell(col: Int, row: Int): Unit =
-    cells(row) = (cells(row) ^ (Flip << col)).asInstanceOf[Char]
+  private def flipCell(col: Column, row: Int): Unit =
+    cells(row) = (cells(row) ^ (Flip << col.id)).asInstanceOf[Char]
 
 object Board:
-  // cell values
-  val Empty = 0
-  val Black = 1
-  val White = 2
   // for printing
   private val Border = "+-+-----------------+-+\n"
   private val LeftEdge = "| | "
