@@ -6,11 +6,10 @@ import com.github.anzumura.game.Column.*
 import scala.annotation.tailrec
 
 class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
-  private var cachedValidMoves: IndexedSeq[(Column, Int)] = _
-  private val blackMsg = "\nscore black(" + Black.symbol + "): "
-  private val whiteMsg = "\nscore white(" + White.symbol + "): "
+  import GameState.*
+  private var cachedValidMoves: Vector[(Column, Int)] = _
 
-  def printSummary(): String =
+  def printSummary: String =
     val result = StringBuilder(blackMsg + totalBlack + whiteMsg + totalWhite)
     if (!hasMoves)
       result ++= "\nGame Over - "
@@ -32,15 +31,16 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
     else totalWhite - totalBlack
 
   def validMoves: IndexedSeq[(Column, Int)] =
-    if (cachedValidMoves == null)
-      cachedValidMoves = for (
-        i <- GameState.allMoves
-        if board.get(i(0), i(1)).isEmpty && GameState
-          .checkValid(board, i(0), i(1))
-      ) yield i
+    if (cachedValidMoves == null) cachedValidMoves = for (
+      i <- allMoves
+      if board.get(i(0), i(1)).isEmpty && checkValid(board, i(0), i(1))
+    ) yield i
     cachedValidMoves
 
 object GameState:
+  private val blackMsg = "\nscore black(" + Black.symbol + "): "
+  private val whiteMsg = "\nscore white(" + White.symbol + "): "
+
   // create 'allMoves' with potentially best moves first and use this for
   // generating validMoves to increase pruning with alphaBeta. Tests at 6 ply
   // showed full game time fall from 43 secs to 13 for black and 56 to 14 for
@@ -50,17 +50,16 @@ object GameState:
     val horizontal = for (i <- C to F; j <- Vector(0, 7)) yield (i, j)
     val vertical = for (i <- Vector(A, H); j <- 2 to 5) yield (i, j)
     val centerHorizontal = for (i <- C to F; j <- Vector(2, 5)) yield (i, j)
-    val centerVertical = for (i <- Vector(C, F); j <- 3 to 4) yield
-      (i, j)
+    val centerVertical = for (i <- Vector(C, F); j <- 3 to 4) yield (i, j)
     val nextToHorizontal = for (i <- C to F; j <- Vector(1, 6)) yield (i, j)
     val nextToVertical = for (i <- Vector(B, G); j <- 2 to 5) yield (i, j)
-    val nextToCorner = Vector((A, 1), (A, 6), (B, 0), (B, 1), (B, 6),
-      (B, 7), (G, 0), (G, 1), (G, 6), (G, 7), (H, 1), (H, 6))
+    val nextToCorner = Vector((A, 1), (A, 6), (B, 0), (B, 1), (B, 6), (B, 7),
+      (G, 0), (G, 1), (G, 6), (G, 7), (H, 1), (H, 6))
     corner ++ horizontal ++ vertical ++ centerHorizontal ++ centerVertical ++
       nextToHorizontal ++ nextToVertical ++ nextToCorner
   }
   // must have 60 unique cells (64 minus the 4 cells set by Board.initialSetup)
-  assert(allMoves.toSet.size == 60)
+  assert(allMoves.length == allMoves.toSet.size && allMoves.length == 60)
 
   def apply(board: Board): GameState =
     var totalBlack = 0

@@ -6,6 +6,6 @@ abstract class Player(val color: Color):
   def makeMove(board: Board, state: GameState): Boolean
 
   def printBoard(board: Board, state: GameState): String =
-    board.print(if (showValid) state else null) + state.printSummary()
+    board.print(if (showValid) state else null) + state.printSummary
 
   override def toString: String = color.toString
