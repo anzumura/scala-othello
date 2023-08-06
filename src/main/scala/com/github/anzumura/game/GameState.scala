@@ -41,22 +41,26 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
     cachedValidMoves
 
 object GameState:
-  private val corner = Vector((A, 0), (H, 0), (A, 7), (H, 7))
-  private val horizontal = for (i <- C to F; j <- Vector(0, 7)) yield (i, j)
-  private val vertical = for (i <- Vector(A, H); j <- 2 to 5) yield (i, j)
-  private val center = for (i <- C to F; j <- 2 to 5) yield (i, j)
-  private val nextToHorizontal =
-    for (i <- C to F; j <- Vector(1, 6)) yield (i, j)
-  private val nextToVertical = for (i <- Vector(B, G); j <- 2 to 5) yield (i, j)
-  private val nextToCorner =
-    IndexedSeq((A, 1), (A, 6), (B, 0), (B, 1), (B, 6), (B, 7), (G, 0), (G, 1),
-      (G, 6), (G, 7), (H, 1), (H, 6))
   // create 'allMoves' with potentially best moves first and use this for
   // generating validMoves to increase pruning with alphaBeta. Tests at 6 ply
   // showed full game time fall from 43 secs to 13 for black and 56 to 14 for
   // white - so 3 to 4 times lower than scanning from A1 to H8
-  private val allMoves = corner ++ horizontal ++ vertical ++ center ++
-    nextToHorizontal ++ nextToVertical ++ nextToCorner
+  private val allMoves = {
+    val corner = Vector((A, 0), (H, 0), (A, 7), (H, 7))
+    val horizontal = for (i <- C to F; j <- Vector(0, 7)) yield (i, j)
+    val vertical = for (i <- Vector(A, H); j <- 2 to 5) yield (i, j)
+    val centerHorizontal = for (i <- C to F; j <- Vector(2, 5)) yield (i, j)
+    val centerVertical = for (i <- Vector(C, F); j <- 3 to 4) yield
+      (i, j)
+    val nextToHorizontal = for (i <- C to F; j <- Vector(1, 6)) yield (i, j)
+    val nextToVertical = for (i <- Vector(B, G); j <- 2 to 5) yield (i, j)
+    val nextToCorner = Vector((A, 1), (A, 6), (B, 0), (B, 1), (B, 6),
+      (B, 7), (G, 0), (G, 1), (G, 6), (G, 7), (H, 1), (H, 6))
+    corner ++ horizontal ++ vertical ++ centerHorizontal ++ centerVertical ++
+      nextToHorizontal ++ nextToVertical ++ nextToCorner
+  }
+  // must have 60 unique cells (64 minus the 4 cells set by Board.initialSetup)
+  assert(allMoves.toSet.size == 60)
 
   def apply(board: Board): GameState =
     var totalBlack = 0
