@@ -13,7 +13,7 @@ class Board:
   def this(board: Board) =
     this()
     turn = board.turn
-    for (i <- cells.indices) cells(i) = board.cells(i)
+    cells.indices.foreach(i => cells(i) = board.cells(i))
 
   def this(board: Board, move: Cell) =
     this(board)
@@ -23,10 +23,7 @@ class Board:
 
   def initialSetup(): Unit =
     turn = Black
-    (0 to 2).foreach(cells(_) = 0)
-    cells(3) = ((White.id << D.id) + (Black.id << E.id)).asInstanceOf[Char]
-    cells(4) = ((Black.id << D.id) + (White.id << E.id)).asInstanceOf[Char]
-    (5 to 7).foreach(cells(_) = 0)
+    cells.indices.foreach(i => cells(i) = InitialSetup(i))
 
   inline def flipColor(): Unit = turn = turn.other
 
@@ -43,7 +40,7 @@ class Board:
     res.toString
 
   def get(c: Cell): Option[Color] =
-    (cells(c.rId) & (Flip << c.cId)).asInstanceOf[Char] >> c.cId match
+    (cells(c.rId) & (Flip << c.cId)).toChar >> c.cId match
       case 0 => Option.empty[Color]
       case x => Option(Color(x))
 
@@ -96,16 +93,20 @@ class Board:
     cellXOrEqual(c.rId, Flip << c.cId)
 
   inline private def cellOrEqual(index: Int, value: Int): Unit =
-    cells(index) = (cells(index) | value).asInstanceOf[Char]
+    cells(index) = (cells(index) | value).toChar
 
   inline private def cellXOrEqual(index: Int, value: Int): Unit =
-    cells(index) = (cells(index) ^ value).asInstanceOf[Char]
+    cells(index) = (cells(index) ^ value).toChar
 
 object Board:
+  // for getting and flipping cells
+  inline private val Flip = 3
   // for printing
   private val Header = {
     val border = "+-+-----------------+-+\n"
     border + "| | " + Column.values.mkString(" ") + " | |\n" + border
   }
-  // for getting and flipping cells
-  inline private val Flip = 3
+  // array used for initial board setup
+  private val InitialSetup =
+    Array(0, 0, 0, (White.id << D.id) + (Black.id << E.id),
+      (Black.id << D.id) + (White.id << E.id), 0, 0, 0).map(_.toChar)
