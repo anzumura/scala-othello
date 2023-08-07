@@ -1,6 +1,7 @@
 package com.github.anzumura.game
 
 import com.github.anzumura.game.Column.*
+import com.github.anzumura.game.Move.*
 import com.github.anzumura.game.Row.*
 
 import scala.annotation.tailrec
@@ -121,10 +122,10 @@ object ScoreCalculator:
   private def isSafeEdge(c: Cell, board: Board, color: Color): Boolean =
     c.isEdgeCol && checkVertical(c, board, color) ||
       c.isEdgeRow && checkHorizontal(c, board, color) ||
-      (c == B2 && checkSafeNextToCorner(board, color, c, -1, -1)) ||
-      (c == B7 && checkSafeNextToCorner(board, color, c, -1, 1)) ||
-      (c == G2 && checkSafeNextToCorner(board, color, c, 1, -1)) ||
-      (c == G7 && checkSafeNextToCorner(board, color, c, 1, 1))
+      (c == B2 && checkSafeNextToCorner(board, color, c, Prev, Prev)) ||
+      (c == B7 && checkSafeNextToCorner(board, color, c, Prev, Next)) ||
+      (c == G2 && checkSafeNextToCorner(board, color, c, Next, Prev)) ||
+      (c == G7 && checkSafeNextToCorner(board, color, c, Next, Next))
 
   private def checkVertical(c: Cell, board: Board, color: Color): Boolean =
     boundary:
@@ -145,10 +146,10 @@ object ScoreCalculator:
                 case Some(x) if x == color => // keep going since same color
                 case None => break(false)
                 case _ =>
-                  if (i.canAdd(1))
+                  if (i.canMove(Next))
                     for (k <- i + 1 to R8)
                       if (get(board, c, k).isEmpty) break(false)
-                  if (j.canAdd(-1))
+                  if (j.canMove(Prev))
                     for (l <- R1 to j - 1)
                       if (get(board, c, l).isEmpty) break(false)
                   break(true)
@@ -175,10 +176,10 @@ object ScoreCalculator:
                 case Some(x) if x == color => // keep going since same color
                 case None => break(false)
                 case _ =>
-                  if (i.canAdd(1))
+                  if (i.canMove(Next))
                     for (k <- i + 1 to H)
                       if (get(board, c, k).isEmpty) break(false)
-                  if (j.canAdd(-1))
+                  if (j.canMove(Prev))
                     for (l <- A to j - 1)
                       if (get(board, c, l).isEmpty) break(false)
                   break(true)
@@ -198,10 +199,10 @@ object ScoreCalculator:
   private def isCenter(c: Cell, board: Board, color: Color): Boolean =
     c.isCenter ||
       // treat cells next to edges as center if the edges are already taken
-      (c.col == B && checkSide(board, color, c, -1, 0)) ||
-      (c.col == G && checkSide(board, color, c, 1, 0)) ||
-      (c.row == R2 && checkSide(board, color, c, 0, -1)) ||
-      (c.row == R7 && checkSide(board, color, c, 0, 1))
+      (c.col == B && checkSide(board, color, c, Prev, Same)) ||
+      (c.col == G && checkSide(board, color, c, Next, Same)) ||
+      (c.row == R2 && checkSide(board, color, c, Same, Prev)) ||
+      (c.row == R7 && checkSide(board, color, c, Same, Next))
 
   private def isNextToEdge(c: Cell, board: Board): Boolean =
     c.isNextToEdge ||
@@ -212,25 +213,25 @@ object ScoreCalculator:
       (c == G7 && board.get(H8).nonEmpty)
 
   private def checkSafeNextToCorner(board: Board, color: Color, c: Cell,
-      colMove: Int, rowMove: Int): Boolean =
-    get(board, c, c.col + colMove).contains(color) &&
-      get(board, c, c.row + rowMove).contains(color) &&
-      board.get(c.add(colMove, rowMove)).contains(color) &&
-      (board.get(c.add(-colMove, rowMove)).contains(color) ||
-        board.get(c.add(colMove, -rowMove)).contains(color) ||
-        (board.get(c.add(-colMove, rowMove)).nonEmpty &&
-          board.get(c.add(colMove, -rowMove)).nonEmpty))
+      colMove: Move, rowMove: Move): Boolean =
+    get(board, c, c.col.move(colMove)).contains(color) &&
+      get(board, c, c.row.move(rowMove)).contains(color) &&
+      board.get(c.move(colMove, rowMove)).contains(color) &&
+      (board.get(c.move(-colMove, rowMove)).contains(color) ||
+        board.get(c.move(colMove, -rowMove)).contains(color) ||
+        (board.get(c.move(-colMove, rowMove)).nonEmpty &&
+          board.get(c.move(colMove, -rowMove)).nonEmpty))
 
-  private def checkSide(board: Board, color: Color, c: Cell, colMove: Int,
-      rowMove: Int): Boolean =
+  private def checkSide(board: Board, color: Color, c: Cell, colMove: Move,
+      rowMove: Move): Boolean =
     // to keep it simple consider this center if adjacent edge is same color or
     // adjacent edge is op color and both of the diagonal edges are set (ie all
     // three relevant edges are set)
-    board.get(c.add(colMove, rowMove)) match
+    board.get(c.move(colMove, rowMove)) match
       case Some(x) if x == color => true
       case None => false
       case _ =>
-        (colMove != 0 && board.get(c.add(colMove, 1)).nonEmpty &&
-          board.get(c.add(colMove, -1)).nonEmpty) ||
-        (rowMove != 0 && board.get(c.add(1, rowMove)).nonEmpty &&
-          board.get(c.add(-1, rowMove)).nonEmpty)
+        (colMove != Same && board.get(c.move(colMove, Next)).nonEmpty &&
+          board.get(c.move(colMove, Prev)).nonEmpty) ||
+        (rowMove != Same && board.get(c.move(Next, rowMove)).nonEmpty &&
+          board.get(c.move(Prev, rowMove)).nonEmpty)

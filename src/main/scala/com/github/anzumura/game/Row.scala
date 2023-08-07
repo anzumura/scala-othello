@@ -1,6 +1,6 @@
 package com.github.anzumura.game
 
-enum Row extends OrderedEnum[Row]:
+enum Row extends OrderedEnum[Row] with MovableEnum[Row]:
   case R1, R2, R3, R4, R5, R6, R7, R8
 
   protected def maxOrdinal: Int = Row.values.length

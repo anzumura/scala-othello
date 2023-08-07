@@ -2,6 +2,7 @@ package com.github.anzumura.game
 
 import com.github.anzumura.game.Color.*
 import com.github.anzumura.game.Column.*
+import com.github.anzumura.game.Move.*
 import com.github.anzumura.game.Row.*
 
 class Board:
@@ -46,10 +47,10 @@ class Board:
 
   def set(c: Cell): Unit =
     cellOrEqual(c.rId, turn.id << c.cId)
-    if (c.col > B) flipHorizontal(c, -1)
-    if (c.col < G) flipHorizontal(c, 1)
-    if (c.row > R2) flipDirection(c, 0, -1)
-    if (c.row < R7) flipDirection(c, 0, 1)
+    if (c.col > B) flipHorizontal(c, Prev)
+    if (c.col < G) flipHorizontal(c, Next)
+    if (c.row > R2) flipDirection(c, Same, Prev)
+    if (c.row < R7) flipDirection(c, Same, Next)
     flipColor()
 
   inline def has(c: Cell): Boolean = get(c).nonEmpty
@@ -67,23 +68,23 @@ class Board:
       .map(_.symbol)
       .getOrElse(if state != null && state.isValid(c) then '*' else '.')
 
-  private def flipHorizontal(c: Cell, horizontal: Int): Unit =
-    flipDirection(c, horizontal, 0)
-    if (c.row > R2) flipDirection(c, horizontal, -1)
-    if (c.row < R7) flipDirection(c, horizontal, 1)
+  private def flipHorizontal(c: Cell, colMove: Move): Unit =
+    flipDirection(c, colMove, Same)
+    if (c.row > R2) flipDirection(c, colMove, Prev)
+    if (c.row < R7) flipDirection(c, colMove, Next)
 
-  private def flipDirection(cIn: Cell, horizontal: Int, vertical: Int): Unit =
-    val c = cIn.add(horizontal, vertical)
-    if (get(c).contains(turn.other) && flipFound(c, horizontal, vertical))
+  private def flipDirection(cIn: Cell, colMove: Move, rowMove: Move): Unit =
+    val c = cIn.move(colMove, rowMove)
+    if (get(c).contains(turn.other) && flipFound(c, colMove, rowMove))
       flipCell(c)
 
-  private def flipFound(cIn: Cell, horizontal: Int, vertical: Int): Boolean =
-    if (!cIn.canAdd(horizontal, vertical)) return false
-    val c = cIn.add(horizontal, vertical)
+  private def flipFound(cIn: Cell, colMove: Move, rowMove: Move): Boolean =
+    if (!cIn.canMove(colMove, rowMove)) return false
+    val c = cIn.move(colMove, rowMove)
     val value = get(c)
     // while cells are opposite color then recurse until my color is found
     if (value.contains(turn.other))
-      if (flipFound(c, horizontal, vertical))
+      if (flipFound(c, colMove, rowMove))
         flipCell(c) // flip on the way back
         return true
       return false

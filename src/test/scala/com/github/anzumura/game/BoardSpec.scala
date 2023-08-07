@@ -76,7 +76,7 @@ class BoardSpec extends AnyFlatSpec with Matchers:
       emptyRow.repeat(2)
   }
 
-  it should "update board after horizontal flip" in {
+  it should "update board after colMove flip" in {
     board.initialSetup()
     board.set(C4) // black makes a move
     board.color shouldBe White

@@ -8,11 +8,11 @@ case class Cell(col: Column, row: Row):
   inline def cId: Int = col.id
   inline def rId: Int = row.ordinal
 
-  inline def canAdd(horizontal: Int, vertical: Int): Boolean =
-    col.canAdd(horizontal) && row.canAdd(vertical)
+  inline def canMove(colMove: Move, rowMove: Move): Boolean =
+    col.canMove(colMove) && row.canMove(rowMove)
 
-  inline def add(horizontal: Int, vertical: Int): Cell =
-    Cell(col + horizontal, row + vertical)
+  inline def move(colMove: Move, rowMove: Move): Cell =
+    Cell(col.move(colMove), row.move(rowMove))
 
   override def toString: String = "" + col + row
 

@@ -1,6 +1,6 @@
 package com.github.anzumura.game
 
-enum Column extends OrderedEnum[Column]:
+enum Column extends OrderedEnum[Column] with MovableEnum[Column]:
   case A, B, C, D, E, F, G, H
 
   protected def maxOrdinal: Int = Column.values.length

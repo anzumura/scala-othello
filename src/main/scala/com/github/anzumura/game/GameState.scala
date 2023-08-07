@@ -2,6 +2,7 @@ package com.github.anzumura.game
 
 import com.github.anzumura.game.Color.*
 import com.github.anzumura.game.Column.*
+import com.github.anzumura.game.Move.*
 import com.github.anzumura.game.Row.*
 
 import scala.annotation.tailrec
@@ -47,8 +48,8 @@ object GameState:
   // white - so 3 to 4 times lower than scanning from A1 to H8
   private val allMoves = {
     val corner = Vector(Cell(A, R1), Cell(H, R1), Cell(A, R8), Cell(H, R8))
-    val horizontal = for (i <- C to F; j <- Vector(R1, R8)) yield Cell(i, j)
-    val vertical = for (i <- Vector(A, H); j <- R3 to R6) yield Cell(i, j)
+    val colMove = for (i <- C to F; j <- Vector(R1, R8)) yield Cell(i, j)
+    val rowMove = for (i <- Vector(A, H); j <- R3 to R6) yield Cell(i, j)
     val centerHorizontal =
       for (i <- C to F; j <- Vector(R3, R6)) yield Cell(i, j)
     val centerVertical = for (i <- Vector(C, F); j <- R4 to R5) yield Cell(i, j)
@@ -58,7 +59,7 @@ object GameState:
     val nextToCorner = Vector(Cell(A, R2), Cell(A, R7), Cell(B, R1),
       Cell(B, R2), Cell(B, R7), Cell(B, R8), Cell(G, R1), Cell(G, R2),
       Cell(G, R7), Cell(G, R8), Cell(H, R2), Cell(H, R7))
-    corner ++ horizontal ++ vertical ++ centerHorizontal ++ centerVertical ++
+    corner ++ colMove ++ rowMove ++ centerHorizontal ++ centerVertical ++
       nextToHorizontal ++ nextToVertical ++ nextToCorner
   }
   // must have 60 unique cells (64 minus the 4 cells set by Board.initialSetup)
@@ -81,43 +82,43 @@ object GameState:
     apply(new Board(state.board, move))
 
   private def checkValid(board: Board, c: Cell): Boolean =
-    (if (c.col < C) checkHorizontal(board, c, 1)
-     else if (c.col > F) checkHorizontal(board, c, -1)
+    (if (c.col < C) checkHorizontal(board, c, Next)
+     else if (c.col > F) checkHorizontal(board, c, Prev)
      else
-       checkHorizontal(board, c, 1) ||
-       checkHorizontal(board, c, -1)) ||
+       checkHorizontal(board, c, Next) ||
+       checkHorizontal(board, c, Prev)) ||
       (c.row match
-        case R1 | R2 => check(board, c, 0, 1)
-        case R7 | R8 => check(board, c, 0, -1)
-        case _ => check(board, c, 0, 1) || check(board, c, 0, -1)
+        case R1 | R2 => check(board, c, Same, Next)
+        case R7 | R8 => check(board, c, Same, Prev)
+        case _ => check(board, c, Same, Next) || check(board, c, Same, Prev)
       )
 
-  private def checkHorizontal(board: Board, c: Cell, horizontal: Int) =
-    check(board, c, horizontal, 0) || (c.row match
-      case R1 | R2 => check(board, c, horizontal, 1)
-      case R7 | R8 => check(board, c, horizontal, -1)
+  private def checkHorizontal(board: Board, c: Cell, colMove: Move) =
+    check(board, c, colMove, Same) || (c.row match
+      case R1 | R2 => check(board, c, colMove, Next)
+      case R7 | R8 => check(board, c, colMove, Prev)
       case _ =>
-        check(board, c, horizontal, 1) ||
-        check(board, c, horizontal, -1)
+        check(board, c, colMove, Next) ||
+        check(board, c, colMove, Prev)
     )
 
   private def check(
-      board: Board, c: Cell, horizontal: Int, vertical: Int): Boolean =
-    doCheck(board, c.add(horizontal, vertical), horizontal, vertical)
+      board: Board, c: Cell, colMove: Move, rowMove: Move): Boolean =
+    doCheck(board, c.move(colMove, rowMove), colMove, rowMove)
 
   private def doCheck(
-      board: Board, c: Cell, horizontal: Int, vertical: Int): Boolean =
+      board: Board, c: Cell, colMove: Move, rowMove: Move): Boolean =
     // make sure the next in this direction is the other color and then start
     // looking for my color
-    board.get(c).contains(board.color.other) && findSameColor(board, c,
-      horizontal, vertical)
+    board.get(c).contains(board.color.other) && findSameColor(board, c, colMove,
+      rowMove)
 
   @tailrec
-  private def findSameColor(board: Board, cIn: Cell, horizontal: Int,
-      vertical: Int): Boolean =
-    if (!cIn.canAdd(horizontal, vertical)) return false
-    val c = cIn.add(horizontal, vertical)
+  private def findSameColor(board: Board, cIn: Cell, colMove: Move,
+      rowMove: Move): Boolean =
+    if (!cIn.canMove(colMove, rowMove)) return false
+    val c = cIn.move(colMove, rowMove)
     board.get(c) match
       case Some(x) if x == board.color.other =>
-        findSameColor(board, c, horizontal, vertical)
+        findSameColor(board, c, colMove, rowMove)
       case x => x.contains(board.color)

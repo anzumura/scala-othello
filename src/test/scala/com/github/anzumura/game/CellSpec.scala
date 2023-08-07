@@ -1,41 +1,42 @@
 package com.github.anzumura.game
 
 import com.github.anzumura.game.Column.*
+import com.github.anzumura.game.Move.*
 import com.github.anzumura.game.Row.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class CellSpec extends AnyFlatSpec with Matchers:
-  private val D3 = Cell(D, R3)
+  private val A1 = Cell(A, R1)
 
   behavior of "Cell"
 
   it should "have expected column id" in {
-    D3.cId shouldBe D3.col.id
+    A1.cId shouldBe A1.col.id
   }
 
   it should "have expected row id" in {
-    D3.rId shouldBe D3.row.ordinal
+    A1.rId shouldBe A1.row.ordinal
   }
 
   it should "return all expected values" in {
     Cell.values.toSet.size shouldBe 64
   }
 
-  it should "support canAdd" in {
-    D3.canAdd(4, 5) shouldBe true
-    D3.canAdd(-3, 5) shouldBe true
-    D3.canAdd(5, 3) shouldBe false
-    D3.canAdd(-2, -6) shouldBe false
+  it should "support canMove" in {
+    A1.canMove(Next, Next) shouldBe true
+    A1.canMove(Same, Next) shouldBe true
+    A1.canMove(Prev, Next) shouldBe false
+    A1.canMove(Same, Prev) shouldBe false
   }
 
-  it should "support add" in {
-    D3.add(2, 3) shouldBe Cell(F, R6)
-    D3.add(-3, -1) shouldBe Cell(A, R2)
+  it should "support move" in {
+    A1.move(Next, Same) shouldBe Cell(B, R1)
+    A1.move(Same, Next) shouldBe Cell(A, R2)
   }
 
   it should "convert to expected string value" in {
-    D3.toString shouldBe "D3"
+    A1.toString shouldBe "A1"
     Cell(H, R2).toString shouldBe "H2"
   }
 
