@@ -26,3 +26,7 @@ class ColorSpec extends AnyFlatSpec with Matchers:
   it should "return expected other value" in {
     values.map(_.other) shouldBe Array(White, Black)
   }
+
+  it should "allow creation from id" in {
+    (1 to 2).map(Color(_)) shouldBe Array(Black, White)
+  }

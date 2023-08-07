@@ -9,6 +9,8 @@
     <option name="testKind" value="All in package" />
     <option name="classBuf">
       <list>
+        <option value="com.github.anzumura.game.RowSpec" />
+        <option value="com.github.anzumura.game.CellSpec" />
         <option value="com.github.anzumura.game.BoardSpec" />
         <option value="com.github.anzumura.game.ColorSpec" />
         <option value="com.github.anzumura.game.ColumnSpec" />

@@ -1,10 +1,10 @@
 package com.github.anzumura.game
 
+import com.github.anzumura.game.Column.*
 import org.scalatest.flatspec.AnyFlatSpec
 import org.scalatest.matchers.should.Matchers
 
 class ColumnSpec extends AnyFlatSpec with Matchers:
-  import com.github.anzumura.game.Column.*
   behavior of "Column"
 
   it should "have expected values" in {
