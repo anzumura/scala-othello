@@ -79,16 +79,17 @@ class Board:
       flipCell(c)
 
   private def flipFound(cIn: Cell, colMove: Move, rowMove: Move): Boolean =
-    if (!cIn.canMove(colMove, rowMove)) return false
-    val c = cIn.move(colMove, rowMove)
-    val value = get(c)
-    // while cells are opposite color then recurse until my color is found
-    if (value.contains(turn.other))
-      if (flipFound(c, colMove, rowMove))
-        flipCell(c) // flip on the way back
-        return true
-      return false
-    value.contains(turn)
+    if (cIn.canMove(colMove, rowMove))
+      val c = cIn.move(colMove, rowMove)
+      get(c) match
+        case None => false
+        case Some(x) if x == turn => true
+        case _ => // if other color, recurse until my color or empty is found
+          if (flipFound(c, colMove, rowMove))
+            flipCell(c) // flip on the way back
+            true
+          else false
+    else false
 
   inline private def flipCell(c: Cell): Unit =
     cellXOrEqual(c.rId, Flip << c.cId)
