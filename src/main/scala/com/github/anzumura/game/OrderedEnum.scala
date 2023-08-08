@@ -7,14 +7,16 @@ trait OrderedEnum[T <: OrderedEnum[T]] extends Ordered[T]:
   protected def create(x: Int): T
 
   def ordinal: Int
-  def canAdd(x: Int): Boolean =
+  override def compare(that: T): Int = ordinal - that.ordinal
+
+  def canAdd(x: Int): Boolean = x == 0 || {
     val res = ordinal + x
     res < maxOrdinal && res >= 0
+  }
 
-  @targetName("plus") def +(x: Int): T = create(ordinal + x)
-  @targetName("minus") def -(x: Int): T = create(ordinal - x)
-  def to(end: T): IndexedSeq[T] = (ordinal to end.ordinal).map(create)
-  override def compare(that: T): Int = ordinal - that.ordinal
+  @targetName("plus") inline def +(x: Int): T = create(ordinal + x)
+  @targetName("minus") inline def -(x: Int): T = create(ordinal - x)
+  inline def to(end: T): IndexedSeq[T] = (ordinal to end.ordinal).map(create)
 
 // for moving by single steps (like in Board class when doing flips)
 enum Move:
