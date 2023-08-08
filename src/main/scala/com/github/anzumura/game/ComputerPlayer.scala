@@ -22,13 +22,10 @@ class ComputerPlayer(color: Color) extends Player(color):
   private def findMove(board: Board, state: GameState): Cell =
     var bestMove: Cell = null
     var bestScore = -ScoreCalculator.WIN
-    var move = 1
     if (search > searchDebug)
       print(getTime + ": scanning " + state.validMoves.length + " moves: ")
     for (i <- state.validMoves)
-      if (search > searchDebug)
-        print(".")
-        move += 1
+      if (search > searchDebug) print(".")
       val score = ScoreCalculator.minLevel(search, GameState(state, i),
         bestScore, ScoreCalculator.WIN, board.color)
       if (bestMove == null || score > bestScore)
