@@ -31,6 +31,6 @@ enum Move:
     else this
 
 // can be mixed in to an enum to allow type safe moving by single steps
-trait MovableEnum[T <: OrderedEnum[T]] extends OrderedEnum[T]:
+trait MovableEnum[T <: MovableEnum[T]] extends OrderedEnum[T]:
   inline def canMove(move: Move): Boolean = canAdd(move.value)
   inline def move(move: Move): T = this + move.value
