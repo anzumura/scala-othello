@@ -16,7 +16,8 @@ trait OrderedEnum[T <: OrderedEnum[T]] extends Ordered[T]:
 
   @targetName("plus") inline def +(x: Int): T = create(ordinal + x)
   @targetName("minus") inline def -(x: Int): T = create(ordinal - x)
-  inline def to(end: T): IndexedSeq[T] = (ordinal to end.ordinal).map(create)
+  inline def to(end: T): Vector[T] =
+    ordinal.to(end.ordinal).map(create).toVector
 
 // for moving by single steps (like in Board class when doing flips)
 enum Move:

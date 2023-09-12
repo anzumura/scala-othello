@@ -32,7 +32,7 @@ class GameState(val totalBlack: Int, val totalWhite: Int, val board: Board):
     if (color == Black) totalBlack - totalWhite
     else totalWhite - totalBlack
 
-  def validMoves: IndexedSeq[Cell] =
+  def validMoves: Vector[Cell] =
     if (cachedValidMoves == null) cachedValidMoves = for (
       i <- allMoves if board.get(i).isEmpty && checkValid(board, i)
     ) yield i
