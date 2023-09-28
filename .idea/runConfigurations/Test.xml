@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Test" type="ScalaTestRunConfiguration" factoryName="ScalaTest" show_console_on_std_err="false" show_console_on_std_out="false">
-    <module name="scala-othello.Othello" />
+    <module name="Othello" />
     <option name="allowRunningInParallel" value="false" />
     <option name="projectPathOnTarget" />
     <option name="selectedOptions">
@@ -9,11 +9,11 @@
     <option name="testKind" value="All in package" />
     <option name="classBuf">
       <list>
-        <option value="com.github.anzumura.game.RowSpec" />
+        <option value="com.github.anzumura.game.ColumnSpec" />
         <option value="com.github.anzumura.game.CellSpec" />
         <option value="com.github.anzumura.game.BoardSpec" />
+        <option value="com.github.anzumura.game.RowSpec" />
         <option value="com.github.anzumura.game.ColorSpec" />
-        <option value="com.github.anzumura.game.ColumnSpec" />
       </list>
     </option>
     <option name="shortenClasspath" value="NONE" />
