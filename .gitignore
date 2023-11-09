@@ -1,5 +1,7 @@
 .bsp
 target
+.idea/modules.xml
+.idea/scala_compiler.xml
 .idea/workspace.xml
-/.idea/libraries/
-/.idea/modules/
+.idea/libraries/
+.idea/modules/
