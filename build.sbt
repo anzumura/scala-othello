@@ -17,7 +17,7 @@ val scalaTestVersion = "3.2.17"
 
 lazy val root = (project in file("."))
   .settings(
-    name := "Othello",
+    name := "scala-othello",
     libraryDependencies += "org.scalatest" %% "scalatest" % scalaTestVersion
       % Test
   )
