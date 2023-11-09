@@ -4,6 +4,8 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Othello.iml" filepath="$PROJECT_DIR$/.idea/modules/Othello.iml" />
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/Othello-build.iml" filepath="$PROJECT_DIR$/.idea/modules/Othello-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/project.Othello-build.iml" filepath="$PROJECT_DIR$/.idea/modules/project.Othello-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/scala-othello.Othello.iml" filepath="$PROJECT_DIR$/.idea/modules/scala-othello.Othello.iml" />
     </modules>
   </component>
 </project>
