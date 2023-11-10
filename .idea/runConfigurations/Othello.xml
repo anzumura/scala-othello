@@ -1,7 +1,5 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Othello" type="Application" factoryName="Application">
-    <option name="ALTERNATIVE_JRE_PATH" value="corretto-17" />
-    <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <option name="MAIN_CLASS_NAME" value="com.github.anzumura.game.Othello" />
     <module name="scala-othello" />
     <method v="2">
