@@ -1,6 +1,6 @@
 # Scala Othello
 
-History:
+## History:
 
 - Early 2012: created this project to learn Scala and IntelliJ IDE (it's based
   on an Othello game I wrote in 'C' in the early 90's)
@@ -12,3 +12,9 @@ History:
   braces and now rely on indentation instead (a very nice Scala 3 feature).
 - Aug 2023: use *SBT* for building and start using *ScalaTest*. I will now try
   to re-write the code in a more functional way (adding tests along the way).
+
+## Future plans:
+
+- add more tests and improve coverage (pull in scoverage)
+- convert comments to scaladoc and use scalafmt
+- maybe add a proper UI instead of a text interface:)
