@@ -88,7 +88,6 @@ object ScoreCalculator:
       })
       newBeta
 
-  // not private because called by tests
   private def scoreCell(
       myColor: Boolean, c: Cell, board: Board, color: Color): Int =
     (if (c.isCorner)
